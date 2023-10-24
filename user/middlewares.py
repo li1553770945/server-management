@@ -1,6 +1,7 @@
 # custom_authentication_middleware.py
 from django.http import JsonResponse
-import  re
+import re
+
 
 class CustomAuthenticationMiddleware:
     def __init__(self, get_response):
@@ -9,7 +10,7 @@ class CustomAuthenticationMiddleware:
 
     def __call__(self, request):
         print(request.path)
-        if not re.match(self.anonymous_url_pattern,request.path):
+        if not re.match(self.anonymous_url_pattern, request.path):
             if not request.user.is_authenticated:
                 response_data = {'code': 4003, 'msg': "请登录后使用"}
                 return JsonResponse(response_data, status=403)

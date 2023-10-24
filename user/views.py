@@ -75,7 +75,7 @@ class MyInfoView(APIView):
         user_data = {
             'id': user.id,
             'username': user.username,
-            'name':user.name,
+            'name':user.first_name,
             'email': user.email,
             # 添加其他需要的字段
         }

@@ -18,12 +18,15 @@ from django.contrib import admin
 from django.urls import path
 
 from user.views import LoginView, PasswordChangeView,MyInfoView
+from server.views import ServerUseView,ServerUseListView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/login', LoginView.as_view(), name='login'),
-    path('api/password_change/', PasswordChangeView.as_view(), name='password_change'),
+    path('api/password-change/', PasswordChangeView.as_view(), name='password_change'),
     path('api/my-info/', MyInfoView.as_view(), name='my-info'),
+    path('api/server-use/', ServerUseView.as_view(), name='server-use'),
+    path('api/server-use-list', ServerUseListView.as_view(), name='server-use-list'),
 ]
 
 from scheduler.sheduler import global_sheduler
