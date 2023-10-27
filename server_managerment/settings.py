@@ -39,8 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user',
     'server',
-    'task',
-    'scheduler'
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -49,7 +48,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'user.middlewares.CustomAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -132,6 +130,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+
     ),
+    'EXCEPTION_HANDLER': 'utils.exceptions.custom_exception_handler',
 }
+
+APPEND_SLASH = False

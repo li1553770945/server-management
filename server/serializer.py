@@ -1,3 +1,5 @@
+from datetime import datetime
+from .models import ServerUseModel
 from rest_framework import serializers
 
 
@@ -7,16 +9,19 @@ class ServerUseSerializer(serializers.Serializer):  # 用于登录的表单合�
     public_key = serializers.CharField(max_length=500, required=True)
 
 
-class UserNameField(serializers.Field):
-    def to_representation(self, obj):
-        return obj.user.first_name
 
 
-class ServerUseListSerializer(serializers.Serializer):
 
-    user_name = UserNameField(source='*')  # 使用自定义字段
-
+class ServerUseListSerializer(serializers.ModelSerializer):
+    server_name = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
     class Meta:
-        model = ServerUseSerializer
-        fields = ['server_id', 'user_name','start_time','end_time']  # 包括其他所需的字段
+        model = ServerUseModel
+        fields = ['server_name', 'username', 'start_time', 'end_time','public_key']  # 包括其他所需的字段
 
+    def get_server_name(self, obj):
+        # 在此方法中返回 server 的名称
+        return obj.server.name
+
+    def get_username(self,obj):
+        return obj.user.username

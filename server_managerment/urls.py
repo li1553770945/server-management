@@ -17,18 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from user.views import LoginView, PasswordChangeView,MyInfoView
-from server.views import ServerUseView,ServerUseListView
+from user.views import PasswordChangeView, MyInfoView,CustomTokenObtainPairView,CustomTokenRefreshView
+from server.views import ServerUseView, ServerUseListView,ServerCurrentUsersView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/login', LoginView.as_view(), name='login'),
     path('api/password-change/', PasswordChangeView.as_view(), name='password_change'),
     path('api/my-info/', MyInfoView.as_view(), name='my-info'),
     path('api/server-use/', ServerUseView.as_view(), name='server-use'),
-    path('api/server-use-list', ServerUseListView.as_view(), name='server-use-list'),
+    path('api/server-use-list/', ServerUseListView.as_view(), name='server-use-list'),
+    path('api/server-use-users/', ServerCurrentUsersView.as_view(), name='server-use-users'),
+    path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
 ]
 
-from scheduler.sheduler import global_sheduler
-
-global_sheduler.start()

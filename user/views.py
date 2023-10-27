@@ -2,49 +2,56 @@ from django.shortcuts import render
 
 # Create your views here.
 # views.py
-from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import update_session_auth_hash
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-import utils.para_valid
-from .serializer import LoginSerializer, PasswordChangeSerializer
-from django.contrib import auth
+from .serializer import PasswordChangeSerializer
+from utils.para_valid import get_first_error
 
-
-class LoginView(APIView):
-    def post(self, request):
+class CustomTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
         context = dict()
-        data = LoginSerializer(data=request.data)
-        if not data.is_valid():  # 验证有效性
-            errors = data.errors
-            context['msg'] = utils.para_valid.get_first_error(errors)
-            context['code'] = 4001
+        try:
+            response = super().post(request, *args, **kwargs)
+            context['code'] = 0
+            context['data'] = dict()
+            context['data']['access_token'] = response.data['access']
+            context['data']['refresh_token'] = response.data['refresh']
             return Response(context)
-
-        data = data.data
-        username = data['username']
-        password = data['password']
-        user = auth.authenticate(username=username, password=password)
-        if user is None:  # 用户名或密码错误
-            context['msg'] = "用户名或密码错误"
+        except Exception as err:
             context['code'] = 4003
+            context['msg'] = str(err)
             return Response(context)
 
-        auth.login(request, user)
-        context['code'] = 0
-        return Response(context)
+
+class CustomTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        context = dict()
+        try:
+            response = super().post(request, *args, **kwargs)
+            context['code'] = 0
+            context['data'] = dict()
+            context['data']['access_token'] = response.data['access']
+            context['data']['refresh_token'] = response.data['refresh']
+            return Response(context)
+        except Exception as err:
+            context['code'] = 4003
+            context['msg'] = str(err)
+            return Response(context)
 
 
 class PasswordChangeView(APIView):
     permission_classes = (IsAuthenticated,)
+
     def post(self, request):
         context = dict()
         data = PasswordChangeSerializer(data=request.POST)
         if not data.is_valid():  # 验证有效性
             errors = data.errors
-            context['msg'] = utils.para_valid.get_first_error(errors)
+            context['msg'] = get_first_error(errors)
             context['code'] = 4001
             return Response(context)
 
@@ -63,9 +70,6 @@ class PasswordChangeView(APIView):
         return Response(context)
 
 
-
-
-
 class MyInfoView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -75,7 +79,7 @@ class MyInfoView(APIView):
         user_data = {
             'id': user.id,
             'username': user.username,
-            'name':user.first_name,
+            'name': user.first_name,
             'email': user.email,
             # 添加其他需要的字段
         }
